@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PageLayout from "@/components/PageLayout";
@@ -55,7 +56,7 @@ const HomePage = () => {
               </Button>
             </Link>
             <Link to="/login">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 shadow-md">
+              <Button size="lg" variant="outline" className="border-white text-yellow-300 hover:bg-white/10 hover:text-yellow-200 shadow-md font-bold">
                 Client Portal
               </Button>
             </Link>
@@ -215,7 +216,7 @@ const HomePage = () => {
               <div className="mt-6 md:mt-0 md:ml-6 flex space-x-4">
                 <Link to="/login">
                   <Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-lg">
-                    Client Portal
+                    <span className="text-primary">Client Portal</span>
                   </Button>
                 </Link>
                 <Link to="/signup">

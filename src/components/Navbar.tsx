@@ -157,7 +157,7 @@ const Navbar = () => {
                 variant="secondary" 
                 size="sm" 
                 onClick={logout} 
-                className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white font-medium"
+                className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-yellow-300 font-medium"
               >
                 <LogOut className="h-4 w-4 mr-1" />
                 Sign out
@@ -166,7 +166,7 @@ const Navbar = () => {
           ) : (
             <div className="flex items-center gap-4">
               <Link to="/login">
-                <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white font-medium">
+                <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-yellow-300 font-medium">
                   Log in
                 </Button>
               </Link>
