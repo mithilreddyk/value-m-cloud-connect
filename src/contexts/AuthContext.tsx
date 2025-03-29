@@ -6,12 +6,14 @@ type User = {
   id: string;
   name: string;
   email: string;
+  companyName?: string;
 };
 
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
+  signup: (email: string, password: string, name: string, companyName: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
 };
@@ -73,6 +75,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signup = async (email: string, password: string, name: string, companyName: string): Promise<boolean> => {
+    setIsLoading(true);
+    
+    // For demo purposes, we'll use a mock signup
+    // In a real app, you would call your authentication API here
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      if (email && password.length >= 6 && name) {
+        const newUser = {
+          id: `user_${Math.random().toString(36).substring(2, 10)}`,
+          name,
+          email,
+          companyName
+        };
+        
+        setUser(newUser);
+        localStorage.setItem("user", JSON.stringify(newUser));
+        
+        toast({
+          title: "Account created successfully",
+          description: `Welcome to Value M, ${name}!`,
+        });
+        
+        setIsLoading(false);
+        return true;
+      } else {
+        throw new Error("Invalid user information");
+      }
+    } catch (error) {
+      toast({
+        title: "Signup failed",
+        description: error instanceof Error ? error.message : "There was a problem creating your account",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return false;
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
@@ -88,6 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         isLoading,
         login,
+        signup,
         logout,
         isAuthenticated: !!user,
       }}
