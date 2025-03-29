@@ -17,7 +17,7 @@
     --primary: 210 100% 40%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 60% 60%;
+    --secondary: 201 96% 32%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 210 40% 96.1%;
@@ -98,5 +98,25 @@
 @layer components {
   .cloud-gradient {
     @apply bg-gradient-to-br from-primary/80 to-secondary/90;
+  }
+  
+  .cloud-card {
+    @apply bg-white shadow-md hover:shadow-lg transition-all duration-300 border-none rounded-lg overflow-hidden;
+  }
+  
+  .cloud-button {
+    @apply bg-primary text-white font-medium shadow-sm hover:shadow-md transition-all duration-300;
+  }
+  
+  .section-title {
+    @apply text-3xl font-bold text-center mb-8;
+  }
+  
+  .section-subtitle {
+    @apply text-xl text-muted-foreground text-center mb-12 max-w-2xl mx-auto;
+  }
+  
+  .cloud-section {
+    @apply py-16 px-4;
   }
 }

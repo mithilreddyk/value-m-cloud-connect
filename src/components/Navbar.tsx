@@ -27,19 +27,22 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-sm border-b">
+    <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-primary/90 to-secondary/90 backdrop-blur-sm border-b shadow-md">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
         <div className="flex lg:flex-1">
           <Link to="/" className="-m-1.5 p-1.5 flex items-center gap-2">
-            <Cloud className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl text-foreground">Value M</span>
+            <Cloud className="h-8 w-8 text-white" />
+            <div className="flex flex-col items-start">
+              <span className="font-bold text-xl text-white">Value M</span>
+              <span className="text-xs text-white/90 font-medium">the cloud company</span>
+            </div>
           </Link>
         </div>
         
         <div className="flex lg:hidden">
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="secondary" size="icon" className="text-white bg-white/20 hover:bg-white/30">
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
@@ -51,7 +54,10 @@ const Navbar = () => {
                   onClick={closeMobileMenu}
                 >
                   <Cloud className="h-6 w-6 text-primary" />
-                  <span className="font-bold text-lg">Value M</span>
+                  <div className="flex flex-col items-start">
+                    <span className="font-bold text-lg">Value M</span>
+                    <span className="text-xs text-muted-foreground">the cloud company</span>
+                  </div>
                 </Link>
                 <Button variant="ghost" size="icon" onClick={closeMobileMenu}>
                   <X className="h-5 w-5" />
@@ -124,10 +130,10 @@ const Navbar = () => {
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  "text-sm font-medium transition-colors",
+                  "px-3 py-2 text-sm font-medium transition-colors rounded-md",
                   location.pathname === item.href 
-                    ? "text-primary" 
-                    : "text-foreground hover:text-primary"
+                    ? "bg-white/20 text-white" 
+                    : "text-white hover:bg-white/10"
                 )}
               >
                 {item.name}
@@ -139,14 +145,14 @@ const Navbar = () => {
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
           {isAuthenticated ? (
             <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-white/90">
                 {user?.name}
               </span>
               <Button 
-                variant="outline" 
+                variant="secondary" 
                 size="sm" 
                 onClick={logout} 
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white font-medium"
               >
                 <LogOut className="h-4 w-4 mr-1" />
                 Sign out
@@ -154,7 +160,7 @@ const Navbar = () => {
             </div>
           ) : (
             <Link to="/login">
-              <Button variant="outline" size="sm">
+              <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white font-medium">
                 Log in
               </Button>
             </Link>

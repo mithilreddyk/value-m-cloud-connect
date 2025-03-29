@@ -37,23 +37,26 @@ const HomePage = () => {
   return (
     <PageLayout>
       {/* Hero Section */}
-      <section className="relative cloud-gradient py-20 sm:py-32">
+      <section className="relative cloud-gradient py-24 sm:py-32 overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/[0.2] bg-[length:20px_20px]" />
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-            Value M Cloud Solutions
+          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl drop-shadow-md">
+            Value M
           </h1>
+          <p className="mt-2 text-2xl text-white/90 font-medium">
+            the cloud company
+          </p>
           <p className="mt-6 max-w-2xl mx-auto text-xl text-white/90">
             Your trusted partner for AWS, Salesforce, Google Cloud, Oracle, and Azure services.
           </p>
           <div className="mt-10 flex justify-center gap-x-6">
             <Link to="/services">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+              <Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-lg">
                 Explore Services
               </Button>
             </Link>
             <Link to="/login">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 shadow-md">
                 Client Portal
               </Button>
             </Link>
@@ -62,22 +65,22 @@ const HomePage = () => {
       </section>
 
       {/* Cloud Services Section */}
-      <section className="py-12 sm:py-16 bg-background">
+      <section className="py-16 sm:py-24 bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <h2 className="section-title bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
               Our Cloud Services
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="section-subtitle">
               Value M provides comprehensive cloud solutions across major platforms to meet all your business needs.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {cloudServices.map((service) => (
-              <Card key={service.name} className="overflow-hidden border-0 shadow-md transition-all hover:shadow-lg">
+              <Card key={service.name} className="cloud-card">
                 <CardContent className="p-6">
-                  <div className="h-12 mb-4 flex items-center">
+                  <div className="h-12 mb-6 flex items-center">
                     <img
                       src={service.image}
                       alt={service.name}
@@ -95,9 +98,9 @@ const HomePage = () => {
             ))}
           </div>
           
-          <div className="mt-10 text-center">
+          <div className="mt-12 text-center">
             <Link to="/services">
-              <Button variant="ghost" className="group">
+              <Button variant="default" className="group shadow-md">
                 View all services
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
@@ -107,20 +110,20 @@ const HomePage = () => {
       </section>
       
       {/* Why Choose Us Section */}
-      <section className="py-12 sm:py-16 bg-accent">
+      <section className="py-16 sm:py-24 bg-gradient-to-br from-accent/50 to-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            <h2 className="section-title">
               Why Choose Value M
             </h2>
-            <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="section-subtitle">
               We deliver exceptional cloud solutions with expertise and dedication.
             </p>
           </div>
           
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="flex flex-col items-center text-center">
-              <div className="rounded-full bg-primary/10 p-4 mb-4">
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-md">
+              <div className="rounded-full bg-primary/10 p-5 mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-8 w-8 text-primary"
@@ -144,8 +147,8 @@ const HomePage = () => {
               </p>
             </div>
             
-            <div className="flex flex-col items-center text-center">
-              <div className="rounded-full bg-primary/10 p-4 mb-4">
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-md">
+              <div className="rounded-full bg-primary/10 p-5 mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-8 w-8 text-primary"
@@ -169,8 +172,8 @@ const HomePage = () => {
               </p>
             </div>
             
-            <div className="flex flex-col items-center text-center">
-              <div className="rounded-full bg-primary/10 p-4 mb-4">
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-md">
+              <div className="rounded-full bg-primary/10 p-5 mb-4">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-8 w-8 text-primary"
@@ -198,12 +201,12 @@ const HomePage = () => {
       </section>
       
       {/* CTA Section */}
-      <section className="py-12 sm:py-16 bg-background">
+      <section className="py-16 sm:py-24 bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl cloud-gradient p-8 md:p-12">
+          <div className="rounded-2xl cloud-gradient p-12 shadow-xl">
             <div className="md:flex md:items-center md:justify-between">
               <div className="max-w-2xl">
-                <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
                   Ready to transform your cloud infrastructure?
                 </h2>
                 <p className="mt-4 text-lg text-white/90">
@@ -212,7 +215,7 @@ const HomePage = () => {
               </div>
               <div className="mt-6 md:mt-0 md:ml-6">
                 <Link to="/login">
-                  <Button size="lg" className="bg-white text-primary hover:bg-white/90">
+                  <Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-lg">
                     Get Started
                   </Button>
                 </Link>

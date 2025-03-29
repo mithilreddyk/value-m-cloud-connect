@@ -132,19 +132,19 @@ const ServicesPage = () => {
     <PageLayout>
       <div className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold sm:text-4xl mb-4">Our Cloud Services</h1>
+          <h1 className="text-3xl font-bold sm:text-4xl mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">Our Cloud Services</h1>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
             Value M offers comprehensive services across major cloud platforms to help businesses leverage the full potential of cloud technologies.
           </p>
         </div>
 
         <Tabs defaultValue="aws" className="space-y-8">
-          <TabsList className="flex flex-wrap justify-center gap-2 h-auto p-1">
+          <TabsList className="flex flex-wrap justify-center gap-2 h-auto p-2 bg-accent/50">
             {cloudProviders.map((provider) => (
               <TabsTrigger 
                 key={provider.id} 
                 value={provider.id}
-                className="flex items-center gap-2 py-2"
+                className="flex items-center gap-2 py-2 data-[state=active]:bg-white data-[state=active]:shadow-md"
               >
                 <img 
                   src={provider.logo} 
@@ -162,7 +162,7 @@ const ServicesPage = () => {
                 <img 
                   src={provider.logo} 
                   alt={provider.name} 
-                  className="h-12 mx-auto mb-4" 
+                  className="h-16 mx-auto mb-4" 
                 />
                 <p className="text-muted-foreground">
                   {provider.description}
@@ -171,40 +171,66 @@ const ServicesPage = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {provider.services.map((service, index) => (
-                  <Card key={index}>
+                  <Card key={index} className="cloud-card hover:border-primary/20">
                     <CardHeader>
                       <CardTitle>{service.name}</CardTitle>
                       <CardDescription>{service.description}</CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">
+                      <p className="text-muted-foreground mb-4">
                         Contact us to learn more about our {service.name} services and how they can benefit your business.
                       </p>
+                      <Button variant="outline" size="sm" className="mt-2">Learn More</Button>
                     </CardContent>
                   </Card>
                 ))}
               </div>
 
-              <div className="bg-accent rounded-lg p-6 mt-8">
-                <h3 className="text-xl font-medium mb-2">Why Choose Value M for {provider.name}?</h3>
-                <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                  <li>Certified {provider.name} experts with years of experience</li>
-                  <li>Proven track record of successful {provider.name} implementations</li>
-                  <li>Tailored solutions designed for your specific business needs</li>
-                  <li>Ongoing support and optimization to ensure maximum ROI</li>
-                  <li>Seamless integration with your existing infrastructure</li>
+              <div className="bg-accent rounded-lg p-8 mt-8 shadow-md">
+                <h3 className="text-xl font-medium mb-4">Why Choose Value M for {provider.name}?</h3>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 text-muted-foreground">
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Certified {provider.name} experts with years of experience
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Proven track record of successful implementations
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Tailored solutions designed for your specific business needs
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Ongoing support and optimization to ensure maximum ROI
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Seamless integration with your existing infrastructure
+                  </li>
                 </ul>
               </div>
             </TabsContent>
           ))}
         </Tabs>
 
-        <div className="mt-16 text-center py-8 px-6 rounded-xl cloud-gradient text-white">
+        <div className="mt-16 text-center py-10 px-6 rounded-xl cloud-gradient text-white shadow-xl">
           <h2 className="text-2xl font-bold mb-4">Ready to transform your cloud infrastructure?</h2>
           <p className="mb-6 max-w-2xl mx-auto">
             Contact our team of cloud experts today to discuss how we can help you leverage the full potential of cloud technologies.
           </p>
-          <Button variant="secondary" size="lg">
+          <Button variant="secondary" size="lg" className="bg-white text-primary hover:bg-white/90">
             Contact Us
           </Button>
         </div>
