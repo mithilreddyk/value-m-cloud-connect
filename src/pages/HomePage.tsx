@@ -213,10 +213,15 @@ const HomePage = () => {
                   Our team of experts is ready to help you navigate the complexities of modern cloud environments.
                 </p>
               </div>
-              <div className="mt-6 md:mt-0 md:ml-6">
+              <div className="mt-6 md:mt-0 md:ml-6 flex space-x-4">
                 <Link to="/login">
                   <Button size="lg" className="bg-white text-primary hover:bg-white/90 shadow-lg">
-                    Get Started
+                    Client Portal
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button size="lg" className="bg-secondary text-white hover:bg-secondary/90 shadow-lg">
+                    Sign Up
                   </Button>
                 </Link>
               </div>

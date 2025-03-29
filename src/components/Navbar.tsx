@@ -112,6 +112,11 @@ const Navbar = () => {
                           Log in
                         </Button>
                       </Link>
+                      <Link to="/signup" onClick={closeMobileMenu}>
+                        <Button variant="default" className="w-full">
+                          Sign up
+                        </Button>
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -159,11 +164,18 @@ const Navbar = () => {
               </Button>
             </div>
           ) : (
-            <Link to="/login">
-              <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white font-medium">
-                Log in
-              </Button>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link to="/login">
+                <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white font-medium">
+                  Log in
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button variant="secondary" size="sm" className="bg-white hover:bg-white/90 text-primary font-medium">
+                  Sign up
+                </Button>
+              </Link>
+            </div>
           )}
         </div>
       </nav>
