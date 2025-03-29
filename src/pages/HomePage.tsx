@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import PageLayout from "@/components/PageLayout";
@@ -56,7 +55,7 @@ const HomePage = () => {
               </Button>
             </Link>
             <Link to="/login">
-              <Button size="lg" variant="outline" className="border-white text-yellow-300 hover:bg-white/10 hover:text-yellow-200 shadow-md font-bold">
+              <Button size="lg" variant="outline" className="border-white text-black hover:bg-white/10 hover:text-black shadow-md font-bold">
                 Client Portal
               </Button>
             </Link>
