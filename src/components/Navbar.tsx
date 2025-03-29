@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,7 @@ const Navbar = () => {
     { name: "Home", href: "/" },
     { name: "Services", href: "/services" },
     { name: "Dashboard", href: "/dashboard", protected: true },
+    { name: "Client Portal", href: "/client-portal", protected: true },
   ];
 
   const closeMobileMenu = () => {
@@ -66,7 +66,6 @@ const Navbar = () => {
               <div className="mt-6 flow-root">
                 <div className="space-y-2 py-6">
                   {navigation.map((item) => {
-                    // Don't render protected items for non-authenticated users
                     if (item.protected && !isAuthenticated) return null;
                     
                     return (
@@ -127,7 +126,6 @@ const Navbar = () => {
         
         <div className="hidden lg:flex lg:gap-x-8">
           {navigation.map((item) => {
-            // Don't render protected items for non-authenticated users
             if (item.protected && !isAuthenticated) return null;
             
             return (
