@@ -4,98 +4,130 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Server, Database, Cloud, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { RefreshCw, Server, Database, Cloud, Settings, Plus } from "lucide-react";
 import PageLayout from "@/components/PageLayout";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCloudIntegrations } from "@/contexts/CloudIntegrationsContext";
+import { getProviderIcon } from "@/utils/cloudIntegrations";
+import CloudProviderConfig from "@/components/CloudProviderConfig";
+import { useToast } from "@/components/ui/use-toast";
 
 const ClientPortalPage = () => {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const { 
+    providers, 
+    configureProvider, 
+    removeProvider, 
+    refreshProviderData, 
+    refreshAllProviders,
+    configuring
+  } = useCloudIntegrations();
+  
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null);
-
-  // Mock data for integrated cloud systems
-  const cloudSystems = [
-    { 
-      id: "aws", 
-      name: "AWS", 
-      logo: <Cloud className="h-8 w-8 text-orange-500" />,
-      services: [
-        { name: "EC2", status: "Operational", usage: 65 },
-        { name: "S3", status: "Operational", usage: 42 },
-        { name: "Lambda", status: "Operational", usage: 78 }
-      ],
-      billingCycle: "October 1 - October 31, 2023",
-      currentCharges: "$1,245.00"
-    },
-    { 
-      id: "azure", 
-      name: "Azure", 
-      logo: <Cloud className="h-8 w-8 text-blue-500" />,
-      services: [
-        { name: "Virtual Machines", status: "Operational", usage: 55 },
-        { name: "Blob Storage", status: "Degraded", usage: 30 },
-        { name: "Functions", status: "Operational", usage: 45 }
-      ],
-      billingCycle: "October 1 - October 31, 2023",
-      currentCharges: "$895.00"
-    },
-    { 
-      id: "gcp", 
-      name: "Google Cloud", 
-      logo: <Cloud className="h-8 w-8 text-green-500" />,
-      services: [
-        { name: "Compute Engine", status: "Operational", usage: 40 },
-        { name: "Cloud Storage", status: "Operational", usage: 62 },
-        { name: "Cloud Functions", status: "Maintenance", usage: 0 }
-      ],
-      billingCycle: "October 1 - October 31, 2023",
-      currentCharges: "$750.00"
-    }
-  ];
-
-  // Filter services by selected provider or show all if none selected
-  const filteredSystems = selectedProvider 
-    ? cloudSystems.filter(system => system.id === selectedProvider) 
-    : cloudSystems;
-
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [configDialogOpen, setConfigDialogOpen] = useState(false);
+  const [selectedProviderId, setSelectedProviderId] = useState<string>("");
+  
+  // Filter providers by selected provider or show all if none selected
+  const filteredProviders = selectedProvider 
+    ? providers.filter(provider => provider.id === selectedProvider && provider.isConfigured) 
+    : providers.filter(provider => provider.isConfigured);
+  
   // Calculate totals
-  const totalServices = cloudSystems.reduce((total, system) => total + system.services.length, 0);
-  const totalCharges = cloudSystems.reduce((total, system) => {
-    const charges = parseFloat(system.currentCharges.replace('$', '').replace(',', ''));
-    return total + charges;
-  }, 0);
+  const totalServices = providers
+    .filter(provider => provider.isConfigured)
+    .reduce((total, provider) => total + provider.services.length, 0);
+    
+  const totalCharges = providers
+    .filter(provider => provider.isConfigured)
+    .reduce((total, provider) => {
+      if (!provider.currentCharges) return total;
+      const charges = parseFloat(provider.currentCharges.replace('$', '').replace(',', ''));
+      return total + charges;
+    }, 0);
 
   // Count operational services
-  const operationalServices = cloudSystems.reduce((count, system) => {
-    return count + system.services.filter(service => service.status === "Operational").length;
-  }, 0);
+  const operationalServices = providers
+    .filter(provider => provider.isConfigured)
+    .reduce((count, provider) => {
+      return count + provider.services.filter(service => service.status === "Operational").length;
+    }, 0);
+
+  // Open config dialog for a specific provider
+  const handleConfigureProvider = (providerId: string) => {
+    setSelectedProviderId(providerId);
+    setConfigDialogOpen(true);
+  };
+
+  // Handle refresh for all providers
+  const handleRefreshAll = async () => {
+    setIsRefreshing(true);
+    try {
+      await refreshAllProviders();
+      toast({
+        title: "Data Refreshed",
+        description: "All cloud provider data has been refreshed."
+      });
+    } catch (error) {
+      console.error("Error refreshing providers:", error);
+      toast({
+        title: "Refresh Failed",
+        description: "Failed to refresh cloud provider data.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   return (
     <PageLayout requireAuth>
       <div className="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Client Portal</h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Client Portal</h1>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex items-center gap-1"
+              onClick={handleRefreshAll}
+              disabled={isRefreshing || providers.filter(p => p.isConfigured).length === 0}
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+        </div>
 
         <div className="flex flex-wrap gap-4 mb-8">
-          {cloudSystems.map((system) => (
+          {providers.filter(provider => provider.isConfigured).map((provider) => (
             <button
-              key={system.id}
-              onClick={() => setSelectedProvider(system.id === selectedProvider ? null : system.id)}
+              key={provider.id}
+              onClick={() => setSelectedProvider(provider.id === selectedProvider ? null : provider.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${
-                system.id === selectedProvider 
+                provider.id === selectedProvider 
                   ? "bg-primary/10 border-primary" 
                   : "bg-card border-border"
               }`}
             >
-              {system.logo}
-              <span>{system.name}</span>
+              {getProviderIcon(provider.id)}
+              <span>{provider.name}</span>
             </button>
           ))}
-          <button
+          
+          <Button
             onClick={() => setSelectedProvider(null)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg border bg-secondary/20 border-secondary"
+            variant="outline"
+            className={`flex items-center gap-2 px-4 py-2 ${
+              !selectedProvider ? "bg-secondary/20 border-secondary" : ""
+            }`}
+            disabled={providers.filter(p => p.isConfigured).length <= 1}
           >
             <Settings className="h-5 w-5" />
             <span>View All</span>
-          </button>
+          </Button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -106,7 +138,7 @@ const ClientPortalPage = () => {
             <CardContent>
               <div className="text-3xl font-bold">{totalServices}</div>
               <p className="text-xs text-muted-foreground mt-1">
-                Across {cloudSystems.length} cloud platforms
+                Across {providers.filter(p => p.isConfigured).length} cloud platforms
               </p>
             </CardContent>
           </Card>
@@ -145,105 +177,137 @@ const ClientPortalPage = () => {
           </TabsList>
           
           <TabsContent value="services" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Cloud Services</CardTitle>
-                <CardDescription>
-                  Monitor the status and usage of your cloud services across all platforms
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-8">
-                  {filteredSystems.map((system) => (
-                    <div key={system.id} className="space-y-4">
-                      <div className="flex items-center gap-2">
-                        {system.logo}
-                        <h3 className="font-medium text-lg">{system.name}</h3>
-                      </div>
-                      
-                      {system.services.map((service) => (
-                        <div key={`${system.id}-${service.name}`} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b pb-4">
-                          <div>
-                            <h3 className="font-medium">{service.name}</h3>
-                          </div>
-                          <div>
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                service.status === "Operational"
-                                  ? "bg-green-100 text-green-800"
-                                  : service.status === "Degraded"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {service.status}
-                            </span>
-                          </div>
-                          <div>
-                            {service.status !== "Maintenance" ? (
-                              <div className="space-y-1">
-                                <div className="flex justify-between text-xs">
-                                  <span>Usage</span>
-                                  <span>{service.usage}%</span>
-                                </div>
-                                <Progress value={service.usage} />
-                              </div>
-                            ) : (
-                              <span className="text-xs text-muted-foreground">
-                                Scheduled maintenance: 3 hours remaining
-                              </span>
-                            )}
-                          </div>
+            {filteredProviders.length > 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Cloud Services</CardTitle>
+                  <CardDescription>
+                    Monitor the status and usage of your cloud services across all platforms
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-8">
+                    {filteredProviders.map((provider) => (
+                      <div key={provider.id} className="space-y-4">
+                        <div className="flex items-center gap-2">
+                          {getProviderIcon(provider.id)}
+                          <h3 className="font-medium text-lg">{provider.name}</h3>
                         </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                        
+                        {provider.services.map((service) => (
+                          <div key={`${provider.id}-${service.name}`} className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center border-b pb-4">
+                            <div>
+                              <h3 className="font-medium">{service.name}</h3>
+                            </div>
+                            <div>
+                              <span
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                  service.status === "Operational"
+                                    ? "bg-green-100 text-green-800"
+                                    : service.status === "Degraded"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-red-100 text-red-800"
+                                }`}
+                              >
+                                {service.status}
+                              </span>
+                            </div>
+                            <div>
+                              {service.status !== "Maintenance" ? (
+                                <div className="space-y-1">
+                                  <div className="flex justify-between text-xs">
+                                    <span>Usage</span>
+                                    <span>{service.usage}%</span>
+                                  </div>
+                                  <Progress value={service.usage} />
+                                </div>
+                              ) : (
+                                <span className="text-xs text-muted-foreground">
+                                  Scheduled maintenance: 3 hours remaining
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>No Cloud Services Configured</CardTitle>
+                  <CardDescription>
+                    Configure cloud providers in the Settings tab to view services here.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={() => setSelectedProvider('settings')} className="mt-2">
+                    Go to Settings
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
           
           <TabsContent value="billing" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Billing Overview</CardTitle>
-                <CardDescription>
-                  View your current billing information across all cloud platforms
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {filteredSystems.map((system) => (
-                    <div key={system.id} className="space-y-4 border-b pb-4">
-                      <div className="flex items-center gap-2">
-                        {system.logo}
-                        <h3 className="font-medium text-lg">{system.name}</h3>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <h3 className="text-sm font-medium text-muted-foreground">Current Billing Period</h3>
-                          <p className="font-medium">{system.billingCycle}</p>
+            {filteredProviders.length > 0 ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Billing Overview</CardTitle>
+                  <CardDescription>
+                    View your current billing information across all cloud platforms
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {filteredProviders.map((provider) => (
+                      <div key={provider.id} className="space-y-4 border-b pb-4">
+                        <div className="flex items-center gap-2">
+                          {getProviderIcon(provider.id)}
+                          <h3 className="font-medium text-lg">{provider.name}</h3>
                         </div>
-                        <div className="space-y-2">
-                          <h3 className="text-sm font-medium text-muted-foreground">Current Charges</h3>
-                          <p className="font-medium">{system.currentCharges}</p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <h3 className="text-sm font-medium text-muted-foreground">Current Billing Period</h3>
+                            <p className="font-medium">{provider.billingCycle}</p>
+                          </div>
+                          <div className="space-y-2">
+                            <h3 className="text-sm font-medium text-muted-foreground">Current Charges</h3>
+                            <p className="font-medium">{provider.currentCharges}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                  
-                  <Alert>
-                    <Database className="h-4 w-4" />
-                    <AlertTitle>Consolidated Billing</AlertTitle>
-                    <AlertDescription>
-                      Value M provides consolidated billing across all your cloud providers.
-                      Your total charges for this month: ${totalCharges.toLocaleString()}
-                    </AlertDescription>
-                  </Alert>
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                    
+                    <Alert>
+                      <Database className="h-4 w-4" />
+                      <AlertTitle>Consolidated Billing</AlertTitle>
+                      <AlertDescription>
+                        Value M provides consolidated billing across all your cloud providers.
+                        Your total charges for this month: ${totalCharges.toLocaleString()}
+                      </AlertDescription>
+                    </Alert>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card>
+                <CardHeader>
+                  <CardTitle>No Billing Information Available</CardTitle>
+                  <CardDescription>
+                    Configure cloud providers in the Settings tab to view billing here.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={() => setSelectedProvider('settings')} className="mt-2">
+                    Go to Settings
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
           
           <TabsContent value="support" className="space-y-4">
@@ -272,19 +336,56 @@ const ClientPortalPage = () => {
           <TabsContent value="settings" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>Portal Settings</CardTitle>
+                <CardTitle>Cloud Integrations</CardTitle>
                 <CardDescription>
-                  Manage your client portal settings and cloud integrations
+                  Configure your cloud provider integrations
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
+                  {providers.map((provider) => (
+                    <div key={provider.id} className="flex items-center justify-between border-b pb-4">
+                      <div className="flex items-center gap-2">
+                        {getProviderIcon(provider.id)}
+                        <h3 className="font-medium">{provider.name}</h3>
+                      </div>
+                      
+                      {provider.isConfigured ? (
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => refreshProviderData(provider.id)}
+                          >
+                            <RefreshCw className="h-4 w-4 mr-1" />
+                            Refresh
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => removeProvider(provider.id)}
+                          >
+                            Disconnect
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleConfigureProvider(provider.id)}
+                        >
+                          <Plus className="h-4 w-4 mr-1" />
+                          Configure
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  
                   <Alert>
                     <Settings className="h-4 w-4" />
-                    <AlertTitle>Cloud Integrations</AlertTitle>
+                    <AlertTitle>API Credentials</AlertTitle>
                     <AlertDescription>
-                      Your account is currently integrated with AWS, Azure, and Google Cloud.
-                      Contact support to add or remove cloud platform integrations.
+                      Your cloud provider API credentials are stored securely in your browser.
+                      For enhanced security in production, we recommend using a secure backend storage solution.
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -293,6 +394,18 @@ const ClientPortalPage = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Provider configuration dialog */}
+      {configDialogOpen && selectedProviderId && (
+        <CloudProviderConfig 
+          providerId={selectedProviderId}
+          providerName={providers.find(p => p.id === selectedProviderId)?.name || ""}
+          isOpen={configDialogOpen}
+          onClose={() => setConfigDialogOpen(false)}
+          onConfirm={(config) => configureProvider(selectedProviderId, config)}
+          isConfiguring={configuring}
+        />
+      )}
     </PageLayout>
   );
 };
